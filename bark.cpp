@@ -23,7 +23,7 @@ Author: Pierre-Antoine Bannier <pierreantoine.bannier@gmail.com>
 
 #define BARK_DEBUG 0
 
-bool allequal(struct ggml_tensor * a, struct ggml_tensor * b, std::string test_name) {
+static bool allequal(struct ggml_tensor * a, struct ggml_tensor * b, std::string test_name) {
     assert(a->ne[0] == b->ne[0]);
     assert(a->ne[1] == b->ne[1]);
     assert(a->ne[2] == b->ne[2]);
@@ -58,7 +58,7 @@ bool allequal(struct ggml_tensor * a, struct ggml_tensor * b, std::string test_n
     return n_violations == 0;
 }
 
-bool allclose(struct ggml_tensor * a, struct ggml_tensor * b, float tol, std::string test_name) {
+static bool allclose(struct ggml_tensor * a, struct ggml_tensor * b, float tol, std::string test_name) {
     assert(a->ne[0] == b->ne[0]);
     assert(a->ne[1] == b->ne[1]);
     assert(a->ne[2] == b->ne[2]);
@@ -97,7 +97,7 @@ bool allclose(struct ggml_tensor * a, struct ggml_tensor * b, float tol, std::st
 }
 
 
-void read_tensor_from_file_f32(std::ifstream & fin, struct ggml_tensor *t) {
+static void read_tensor_from_file_f32(std::ifstream & fin, struct ggml_tensor *t) {
     int32_t n_dims;
     read_safe(fin, n_dims);
 
@@ -117,7 +117,7 @@ void read_tensor_from_file_f32(std::ifstream & fin, struct ggml_tensor *t) {
     }
 }
 
-void read_tensor_from_file_int32(std::ifstream & fin, struct ggml_tensor *t) {
+static void read_tensor_from_file_int32(std::ifstream & fin, struct ggml_tensor *t) {
     int32_t n_dims;
     read_safe(fin, n_dims);
 
@@ -137,7 +137,7 @@ void read_tensor_from_file_int32(std::ifstream & fin, struct ggml_tensor *t) {
     }
 }
 
-void read_tensor_from_file(std::ifstream & fin, struct ggml_tensor * t) {
+static void read_tensor_from_file(std::ifstream & fin, struct ggml_tensor * t) {
     if (t->type == GGML_TYPE_F32) {
         read_tensor_from_file_f32(fin, t);
     } else if (t->type == GGML_TYPE_I32) {
@@ -147,7 +147,7 @@ void read_tensor_from_file(std::ifstream & fin, struct ggml_tensor * t) {
     }
 }
 
-void load_gt_tensor(std::string path, struct ggml_tensor * t) {
+static void load_gt_tensor(std::string path, struct ggml_tensor * t) {
     auto fin = std::ifstream(path, std::ios::binary);
     if (!fin) {
         fprintf(stderr, "failed to open.");
@@ -156,7 +156,7 @@ void load_gt_tensor(std::string path, struct ggml_tensor * t) {
     read_tensor_from_file(fin, t);
 }
 
-void print_tensor(struct ggml_tensor * a) {
+static void print_tensor(struct ggml_tensor * a) {
     for (int i = 0; i < a->ne[3]; i++) {
         for (int j = 0; j < a->ne[2]; j++) {
             for (int k = 0; k < a->ne[1]; k++) {
@@ -1179,7 +1179,7 @@ bool gpt_eval(
             cur = ggml_add(ctx0,
                     ggml_repeat(ctx0, model.layers[il].c_mlp_fc_b, cur),
                     cur);
-            
+
             // GELU activation
             // [3072, N]
             cur = ggml_gelu(ctx0, cur);
